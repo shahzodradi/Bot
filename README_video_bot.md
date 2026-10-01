@@ -76,3 +76,66 @@ alohida sozlash shart emas.
   jo'natadi.
 - Kanal **private** bo'lsa ham bot ishlayveradi, chunki bot admin sifatida a'zo — foydalanuvchi
   kanalga a'zo bo'lishi shart emas, faqat bot bilan gaplashadi.
+
+---
+
+# Instagram izohlariga avtomatik link yuborish
+
+`instagram_comment_bot.py` — kimdir Instagram postingiz ostiga izoh yozsa, bot o'sha odamga
+**Direct** orqali link yuboradi va izohga "✅ Linkni Direct'ga yubordim!" deb javob yozadi.
+
+Qaysi link yuborilishi:
+
+1. Izohda `instagram_links.json`dagi kalit so'z bo'lsa (masalan `kino`) — o'sha link.
+2. Izohda raqam bo'lsa (masalan `7`) va `TELEGRAM_BOT_USERNAME` berilgan bo'lsa —
+   `https://t.me/<bot>?start=7`. Foydalanuvchi linkni bossa, Telegram bot unga **7-videoni
+   darhol** yuboradi.
+3. Aks holda `DEFAULT_LINK` (berilgan bo'lsa), bo'lmasa hech narsa yuborilmaydi.
+
+## 1. Instagram va Meta ilovasini sozlash
+
+1. Instagram akkauntingiz **Professional** (Business yoki Creator) bo'lishi kerak:
+   Sozlamalar → Akkaunt turi.
+2. [developers.facebook.com](https://developers.facebook.com/apps)da yangi ilova yarating
+   (turi: **Business**), unga **Instagram** mahsulotini qo'shing va
+   "API setup with Instagram login" bo'limini oching.
+3. Instagram akkauntingizni qo'shing va **access token** yarating — bu `IG_ACCESS_TOKEN`.
+   Ruxsatlar: `instagram_business_basic`, `instagram_business_manage_comments`,
+   `instagram_business_manage_messages`.
+4. Shu sahifadagi **Instagram app secret** — bu `IG_APP_SECRET`.
+5. Instagram ilovasida: Sozlamalar → Maxfiylik → Xabarlar → **"Connected tools"
+   (Ulangan vositalar)** ga ruxsat bering, aks holda Direct xabar yuborilmaydi.
+
+## 2. Serverga joylash (Render.com)
+
+Telegram botdagi kabi **New → Web Service**, lekin alohida servis sifatida:
+
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `python instagram_comment_bot.py`
+- **Environment**:
+  - `IG_ACCESS_TOKEN`, `IG_APP_SECRET`
+  - `IG_VERIFY_TOKEN` — o'zingiz o'ylab topgan istalgan so'z (masalan `mening_sirim_123`)
+  - `TELEGRAM_BOT_USERNAME` — Telegram botingiz nomi, `@`siz (ixtiyoriy)
+  - `DEFAULT_LINK` — mos so'z topilmasa yuboriladigan link (ixtiyoriy)
+  - `DM_TEMPLATE` — Direct xabar matni, `{link}` o'rniga link qo'yiladi (ixtiyoriy)
+  - `PUBLIC_REPLY` — izohga ochiq javob matni (ixtiyoriy; javob yozilmasin desangiz,
+    qiymatini bitta bo'sh joy emas, butunlay bo'sh qilib qo'ying)
+
+## 3. Webhook'ni ulash
+
+1. Meta ilovasida "Configure webhooks" bo'limida:
+   - **Callback URL**: `https://<render-manzilingiz>.onrender.com/webhook`
+   - **Verify token**: `IG_VERIFY_TOKEN` bilan bir xil so'z
+2. **Verify and save** bosing, so'ng **comments** maydoniga obuna bo'ling (Subscribe).
+3. Akkaunt uchun webhook'ni yoqing ("Webhook subscription" tugmasi).
+
+## 4. Muhim cheklovlar
+
+- Ilova **Development** rejimida bo'lsa, bot faqat ilovaga "Instagram tester" sifatida
+  qo'shilgan akkauntlar izohlariga javob beradi. Hammaga ishlashi uchun ilovani
+  **Live** rejimga o'tkazish va yuqoridagi ruxsatlar uchun Meta **App Review**dan o'tish kerak.
+- Instagram har bir izohga faqat **bitta** Direct javob yuborishga va faqat izoh yozilganidan
+  keyin **7 kun ichida** ruxsat beradi.
+- Access token muddati ~60 kun; muddati tugashidan oldin uni yangilab turing.
+- Kalit so'z va linklarni `instagram_links.json` faylida o'zgartiring (kichik-katta harf farqi
+  yo'q).

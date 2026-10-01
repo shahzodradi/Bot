@@ -27,7 +27,24 @@ def save_map(data: dict):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+async def send_video(update: Update, context: ContextTypes.DEFAULT_TYPE, number: str):
+    data = load_map()
+    if number not in data:
+        await update.message.reply_text("Bunday raqamli video topilmadi.")
+        return
+
+    await context.bot.copy_message(
+        chat_id=update.effective_chat.id,
+        from_chat_id=CHANNEL_ID,
+        message_id=data[number],
+    )
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Instagram'dan kelgan link (t.me/bot?start=7) bo'lsa — videoni darhol yuboramiz
+    if context.args:
+        await send_video(update, context, context.args[0])
+        return
     await update.message.reply_text(
         "Salom! Menga video raqamini yuboring, men sizga o'sha videoni jo'nataman."
     )
@@ -76,16 +93,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         return
 
     # Oddiy foydalanuvchi so'rovi
-    data = load_map()
-    if text not in data:
-        await update.message.reply_text("Bunday raqamli video topilmadi.")
-        return
-
-    await context.bot.copy_message(
-        chat_id=update.effective_chat.id,
-        from_chat_id=CHANNEL_ID,
-        message_id=data[text],
-    )
+    await send_video(update, context, text)
 
 
 def main():
