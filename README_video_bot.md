@@ -81,8 +81,20 @@ alohida sozlash shart emas.
 
 # Instagram izohlariga avtomatik link yuborish
 
-`instagram_comment_bot.py` — kimdir Instagram postingiz ostiga izoh yozsa, bot o'sha odamga
-**Direct** orqali link yuboradi va izohga "✅ Linkni Direct'ga yubordim!" deb javob yozadi.
+`instagram_comment_bot.py` quyidagicha ishlaydi:
+
+1. Kimdir postingiz ostiga izoh yozadi.
+2. Bot izohga **bir marta** javob yozadi: "Directingizga qarang 📩", "Jo'natdim ✅",
+   "Directingizni tekshiring 👀" va h.k. Har safar shu iboralardan tasodifiy bittasi tanlanadi.
+3. Direct'ga: "🎉 Tabriklayman! Siz linkni qo'lga kiritganlar safiga kirdingiz! Faqat linkni
+   olish uchun avval bizga obuna bo'ling" xabari va pastida **🔗 Linkni olish** tugmasi keladi.
+4. Tugma bosilganda bot obunani tekshiradi:
+   - obuna bo'lmagan bo'lsa — "Siz hali ham obuna bo'lmagansiz. Avval obuna bo'ling,
+     Qadrdon!" xabari va tugma qaytadan keladi;
+   - obuna bo'lgan bo'lsa — "✅ Ha, ana endi! Bu link sizga: ..." deb linkni yuboradi.
+
+Barcha matnlarni `instagram_comment_bot.py` boshidagi `PUBLIC_REPLIES`, `WELCOME_TEXT`,
+`NOT_FOLLOWING_TEXT`, `LINK_TEXT` qatorlarida o'zgartirishingiz mumkin.
 
 Qaysi link yuborilishi:
 
@@ -116,17 +128,15 @@ Telegram botdagi kabi **New → Web Service**, lekin alohida servis sifatida:
   - `IG_ACCESS_TOKEN`, `IG_APP_SECRET`
   - `IG_VERIFY_TOKEN` — o'zingiz o'ylab topgan istalgan so'z (masalan `mening_sirim_123`)
   - `TELEGRAM_BOT_USERNAME` — Telegram botingiz nomi, `@`siz (ixtiyoriy)
-  - `DEFAULT_LINK` — mos so'z topilmasa yuboriladigan link (ixtiyoriy)
-  - `DM_TEMPLATE` — Direct xabar matni, `{link}` o'rniga link qo'yiladi (ixtiyoriy)
-  - `PUBLIC_REPLY` — izohga ochiq javob matni (ixtiyoriy; javob yozilmasin desangiz,
-    qiymatini bitta bo'sh joy emas, butunlay bo'sh qilib qo'ying)
+  - `DEFAULT_LINK` — izoh yozgan har bir odamga beriladigan link (**asosiy sozlama**)
 
 ## 3. Webhook'ni ulash
 
 1. Meta ilovasida "Configure webhooks" bo'limida:
    - **Callback URL**: `https://<render-manzilingiz>.onrender.com/webhook`
    - **Verify token**: `IG_VERIFY_TOKEN` bilan bir xil so'z
-2. **Verify and save** bosing, so'ng **comments** maydoniga obuna bo'ling (Subscribe).
+2. **Verify and save** bosing, so'ng **comments**, **messages** va **messaging_postbacks**
+   maydonlariga obuna bo'ling (Subscribe). `messaging_postbacks`siz tugma ishlamaydi.
 3. Akkaunt uchun webhook'ni yoqing ("Webhook subscription" tugmasi).
 
 ## 4. Muhim cheklovlar
